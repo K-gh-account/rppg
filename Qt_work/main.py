@@ -1,9 +1,8 @@
 '''
-Author: Harryhht
-Date: 2022-02-01 20:51:25
-LastEditors: Harryhht
-LastEditTime: 2022-02-21 02:02:50
-Description: Main structure for the application
+Author: Kenneth
+Date: 2024-07-01 14:25:25
+LastEditors: Kenneth
+Description: QT Main  application
 '''
 
 import sys

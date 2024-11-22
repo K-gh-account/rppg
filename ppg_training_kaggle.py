@@ -1,31 +1,3 @@
-""" train neural architectures using PPG data
-
-This script trains a neural network using PPG data. The data is loaded from the the .tfrecord files created by the script
-'hdf_to_tfrecord.py'. Four different neural architectures can be selected:
-
-- AlexNet [1]
-- ResNet [2]
-- Architecture published by Slapnicar et al. (modified to work with Tensorflow 2.4.1) [3] The original code can be downloaded
-  from https://github.com/gslapnicar/bp-estimation-mimic3
-- LSTM network
-
-A checkpoint callback is used to store the best network weights in terms of validation loss. These weights are subsequently
-used to perform predictions on the test set. Test results are stored in a csv file for later evaluation.
-
-References
-[1] A. Krizhevsky, I. Sutskever, und G. E. Hinton, „ImageNet classification with deep convolutional neural networks“,
-    Commun. ACM, Bd. 60, Nr. 6, S. 84–90, Mai 2017, doi: 10.1145/3065386.
-[2] K. He, X. Zhang, S. Ren, und J. Sun, „Deep Residual Learning for Image Recognition“, in 2016 IEEE Conference on
-    Computer Vision and Pattern Recognition (CVPR), Las Vegas, NV, USA, Juni 2016, S. 770–778. doi: 10.1109/CVPR.2016.90.
-[3] G. Slapničar, N. Mlakar, und M. Luštrek, „Blood Pressure Estimation from Photoplethysmogram Using a Spectro-Temporal
-    Deep Neural Network“, Sensors, Bd. 19, Nr. 15, S. 3420, Aug. 2019, doi: 10.3390/s19153420.
-
-File: prepare_MIMIC_dataset.py
-Author: Dr.-Ing. Fabian Schrumpf
-E-Mail: Fabian.Schrumpf@htwk-leipzig.de
-Date created: 8/9/2021
-Date last modified: 8/9/2021
-"""
 
 from os.path import expanduser, join
 from os import environ

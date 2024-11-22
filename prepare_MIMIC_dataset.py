@@ -1,16 +1,4 @@
-""" Preprocessing script for PPG data downloaded from the MIMIC-III databse
 
-This script preprocesses the downloaded PPG data. ABP and PPG signals are divided into windows of a defined length and
-overlap. Ground truth SBP and DBP values are extracted from the ABP signals. PPG signals are filtered. Different
-plausibility and sanity checks are performed to exclude artifacts from the dataset. PPG signal windows and associated
-SBP/DBP value pairs are stored in a .h5 file.
-
-File: prepare_MIMIC_dataset.py
-Author: Dr.-Ing. Fabian Schrumpf
-E-Mail: Fabian.Schrumpf@htwk-leipzig.de
-Date created: 8/5/2021
-Date last modified: 8/5/2021
-"""
 
 from os.path import join, expanduser, isfile, splitext
 from os import listdir, scandir, chdir

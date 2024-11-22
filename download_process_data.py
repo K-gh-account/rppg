@@ -1,19 +1,4 @@
 
-""" Download script for MIMIC-III data
-
-In order to reproduce the results in the Sensors publication "Assessment of non-invasive blood pressure prediction from
-PPG and rPPG signals using deep learning" the exact same data as used in the paper is downloaded. The record names are
-provided in a text file. The scripts downloads those records, extract PPG and ABP data and performs peak detection on the
-ABP (systolic and diastolic peaks of the ABP signals to generate systolic and diastolic blood pressure values as ground
-truth) and PPG signals. ABP and PPG signals as well as the detected peaks are stored in .h5 files.
-
-File: download_mimic_iii_records.py
-Author: Dr.-Ing. Fabian Schrumpf
-E-Mail: Fabian.Schrumpf@htwk-leipzig.de
-Date created: 8/4/2021
-Date last modified: 8/4/2021
-"""
-
 from itertools import compress
 import datetime
 from os.path import join, isdir, isfile

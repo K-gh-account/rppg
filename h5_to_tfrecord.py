@@ -1,17 +1,3 @@
-""" Convert PPG/BP samples pairs to a binary format that is used for training neural networks using Tensorflow
-
-This script reads a dataset consisting of PPG and BP samples from a .h5 file and converts them into a binary format that
-can be used for as input data for a neural network during training. The dataset can be divided into training, validation
-and test set by (i) dividing the dataset on a subject basis ensuring that data from one subject are not scattered across
-training, validation and test set or (ii) dividing the dataset randomly.
-
-File: prepare_MIMIC_dataset.py
-Author: Dr.-Ing. Fabian Schrumpf
-E-Mail: Fabian.Schrumpf@htwk-leipzig.de
-Date created: 8/6/2021
-Date last modified: 8/6/2021
-"""
-
 import matplotlib.pyplot as plt
 import argparse
 import pandas as pd

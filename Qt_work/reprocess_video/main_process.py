@@ -1,10 +1,4 @@
-'''
-Author: Harryhht
-Date: 2022-02-01 20:51:25
-LastEditors: Harryhht
-LastEditTime: 2022-02-21 02:02:50
-Description: Main structure for the application
-'''
+
 
 import sys
 from main_rppg_window import Ui_MainWindow

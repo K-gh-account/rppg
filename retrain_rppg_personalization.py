@@ -1,17 +1,4 @@
-""" fine tune pretrained neural networks using rPPG data
 
-This script trains neural network for the rPPG based prediction of blood pressure values using transfer learning. Neural
-networks were previously trained using PPG data. rPPG data is provided via a hdf5 file. Validation is performed using a
-leave-one-subject out cross validation scheme. Optionally, personalization of the neural network can be performed by using
-a fraction of the test subject's data for training. The selection of this additional training data can be done randomly
-or systematically
-
-File: retrain_rppg_personalization.py
-Author: Dr.-Ing. Fabian Schrumpf
-E-Mail: Fabian.Schrumpf@htwk-leipzig.de
-Date created: 9/9/2021
-Date last modified: --
-"""
 
 from os.path import expanduser, join
 import argparse
