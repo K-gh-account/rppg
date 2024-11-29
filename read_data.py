@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Oct 20 16:57:28 2024
-
+transfer the old 10s version video data to TFrecord.
+this script was kept to handle the old 10s rppg data. And the now the video data collection is change to 40s
 @author: kenne
 """
 

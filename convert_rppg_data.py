@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Oct 20 16:57:28 2024
-
+Transfer the 40s rppg data to .h5 file: prepare_retrain_dataset(DataPath, TrainFile, TestFile, ValFile)
+Turn the .h5 file to TF_record: rppg_hdf2tfrecord(h5_file, tfrecord_path, modus="train", weights_SBP=None, weights_DBP=None)
 @author: kenne
 """
 
@@ -243,4 +244,3 @@ if __name__ == "__main__":
     rppg_hdf2tfrecord('.\\data\\retrain_data.h5',tfrecord_path_train,modus='train')
     rppg_hdf2tfrecord('.\\data\\retest_data.h5',tfrecord_path_test,modus='test')
     rppg_hdf2tfrecord('.\\data\\reval_data.h5',tfrecord_path_val,modus='val')
-    # rppg_hdf2tfrecord('.\\data\\retrain_data.h5',tfrecord_path_val,idx=val_idx,modus='val')

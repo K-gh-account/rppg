@@ -1,4 +1,9 @@
-
+'''
+Author: Kenneth
+Date: 2024-07-01 14:25:25
+LastEditors: Kenneth
+Description: turn the ppg data from h5 to TF_record
+'''
 
 import matplotlib.pyplot as plt
 import argparse

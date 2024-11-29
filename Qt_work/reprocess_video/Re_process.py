@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Oct 20 16:57:28 2024
-
+change the filter to (0.3,4)
 @author: kenne
 """
 

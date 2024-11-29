@@ -1,5 +1,10 @@
 
-
+'''
+Author: Kenneth
+Date: 2024-07-01 14:25:25
+LastEditors: Kenneth
+Description: Transfer MimicIII raw data to h5 file
+'''
 from os.path import join, expanduser, isfile, splitext
 from os import listdir, scandir, chdir
 from random import shuffle
