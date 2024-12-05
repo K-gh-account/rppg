@@ -5,4 +5,5 @@ test/
 Watch/
 Qt_work/reprocess_video/rppg_video/
 Qt_work/rppg_video
+retrain/
 data/rPPG-BP-UKL_rppg_7s.h5
