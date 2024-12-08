@@ -220,7 +220,7 @@ if __name__ == "__main__":
         batch_size = 16
         win_len = 175
         lr = None
-        N_epochs = 10
+        N_epochs = 1
 
     tfrecord_basename = 'RETRAIN_RPPG'
 

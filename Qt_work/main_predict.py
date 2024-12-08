@@ -10,6 +10,7 @@ from main_rppg_predict_window import Ui_MainWindow
 import os
 import shutil
 import pandas as pd
+import gc
 from scipy.fft import rfft, rfftfreq
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication
 from PyQt5 import QtCore
@@ -27,12 +28,23 @@ import cv2 as cv
 from face2series import VIDEO2FACE
 from queue import Queue
 from scipy.signal import butter, filtfilt
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 最高级别屏蔽
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
+import tensorflow as tf
+tf.get_logger().setLevel('ERROR')
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+from models.define_ResNet_1D import ResNet50_1D
+from models.define_AlexNet_1D import AlexNet_1D
+from models.define_LSTM import define_LSTM
+from models.slapnicar_model import raw_signals_deep_ResNet
 
 fps = 25
-win_size = 40*fps
-BufferSize = 1050
-
-
+win_size = 10*fps
+BufferSize = 250
+arch = 'resnet'
+dataInShape = (175,1)
+UseDerivative = True
+filePath = "2024-04-12_resnet_rppg_retrain_cb.h5"
 class mainwin(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(mainwin, self).__init__(parent)
@@ -56,21 +68,13 @@ class mainwin(QMainWindow, Ui_MainWindow):
 
         self.slot_init()
         self.stop.setEnabled(False)
-        self.submit.setEnabled(False)
-        self.redo.setEnabled(False)
         self.next.setEnabled(False)
-        self.SBP.setEnabled(False)
-        self.DBP.setEnabled(False)
-        self.SBP.setValidator(QIntValidator())
-        self.DBP.setValidator(QIntValidator())
 
     def slot_init(self):
         self.TIMER_Frame.timeout.connect(self.DisplayImage)
         self.start.clicked.connect(self.RecordVideo)
         self.stop.clicked.connect(self.SaveVideo)
         self.quit.clicked.connect(self.QuitApp)
-        self.submit.clicked.connect(self.SubmitData)
-        self.redo.clicked.connect(self.ReTake)
         self.next.clicked.connect(self.NextOne)
 
     def Face2Signal(self):
@@ -112,39 +116,6 @@ class mainwin(QMainWindow, Ui_MainWindow):
         self.heartRate = HR_rate
         return True
 
-    def SubmitData(self):
-        SBP = self.SBP.text()
-        DBP = self.DBP.text()
-
-        if SBP == '' or DBP == '':
-            reply = QMessageBox.about(self, "警告", "请输入合理的收缩压和舒张压")
-            return False
-
-        SBP = int(SBP)
-        DBP = int(DBP)
-
-        if (40 < SBP, DBP < 250) != (True,True) or SBP <= DBP:
-            reply = QMessageBox.about(self, "警告", "请输入合理的收缩压和舒张压")
-            return False
-        name = str(int(time.time()))
-        dataName = name + '_' + str(SBP) + '_' + str(DBP) + '.csv'
-        videoName = name + '.mp4'
-
-        dataName = os.path.join("rppg_data", dataName)
-        videoName = os.path.join("rppg_video", videoName)
-        pd.DataFrame(self.processor.sig_fore_out).to_csv(dataName)
-        shutil.copyfile("test.mp4",videoName)
-        self.status.setText("数据提交成功，请继续下一个，或结束程序")
-        self.SBP.clear()
-        self.DBP.clear()
-        self.submit.setEnabled(False)
-        self.next.setEnabled(True)
-        self.start.setEnabled(False)
-        self.redo.setEnabled(False)
-        self.SBP.setEnabled(False)
-        self.DBP.setEnabled(False)
-        self.Hist_fore_signal.setData(np.array([]), pen=(255, 0, 0))
-
     def QuitApp(self):
         reply = QMessageBox.question(self, '提示',
                                      "是否要关闭所有窗口?",
@@ -173,41 +144,10 @@ class mainwin(QMainWindow, Ui_MainWindow):
         self.processor.Sig_fore = None
         self.processor.Sig_fore_out = None
         self.start.setEnabled(True)
-        self.redo.setEnabled(False)
         self.status.setText("空闲中。。。")
-        self.Hist_fore_signal.setData(np.array([]), pen=(255, 0, 0))
-        self.processor.PROCESS_start()
-
-    def ReTake(self):
-        reply = QMessageBox.question(self, '提示',
-                                     "重做将抛弃当前视频，是否继续?",
-                                     QMessageBox.Yes | QMessageBox.No,
-                                     QMessageBox.No)
-        if reply != QMessageBox.Yes:
-            return
-        self.processor.cam = cv.VideoCapture(0)
-        self.processor.cam.set(cv.CAP_PROP_FPS, 25)
-        self.processor.cam.set(3,1280)
-        self.processor.cam.set(4,720)
-        self.processor.cam.set(6, cv.VideoWriter.fourcc('M', 'J', 'P', 'G'))
-        self.processor.Queue_saveframe.queue.clear()
-        self.processor.Queue_rawframe.queue.clear()
-        self.processor.Queue_Sig_fore.queue.clear()
-        self.processor.Flag_face = False
-        self.processor.Flag_Queue = False
-        self.processor.frame_display = None
-        self.processor.face_mask = None
-        self.processor.Sig_fore = None
-        self.processor.Sig_fore_out = None
-        self.SBP.clear()
-        self.DBP.clear()
-        self.submit.setEnabled(False)
-        self.next.setEnabled(False)
-        self.start.setEnabled(True)
-        self.redo.setEnabled(False)
-        self.SBP.setEnabled(False)
-        self.DBP.setEnabled(False)
-        self.status.setText("空闲中。。。")
+        self.SBPlabel.setText("收缩压:")
+        self.DBPlabel.setText("舒张压:")
+        self.HRlabel.setText("心跳:")
         self.Hist_fore_signal.setData(np.array([]), pen=(255, 0, 0))
         self.processor.PROCESS_start()
 
@@ -226,7 +166,7 @@ class mainwin(QMainWindow, Ui_MainWindow):
         self.stop.setEnabled(False)
         self.processor.cam.release()
         if self.processor.Queue_saveframe.qsize() <= BufferSize:
-            self.status.setText("录制视频不足三十秒，请重做一次")
+            self.status.setText("录制视频不足十秒，请重做一次")
             QApplication.processEvents()
         else:
             self.status.setText("正在审核视频，并做信号处理，请稍等。。。")
@@ -244,14 +184,44 @@ class mainwin(QMainWindow, Ui_MainWindow):
             time.sleep(2)
             videoWrite.release()
             if self.Face2Signal():
-                self.status.setText("处理完成，心跳:"+self.heartRate+"   输入血压后提交，或重做。")
-                self.SBP.setEnabled(True)
-                self.DBP.setEnabled(True)
-                self.submit.setEnabled(True)
-                self.redo.setEnabled(True)
+                self.status.setText("信号处理完成，正在运行神经网络，请稍等。。。")
+                inputData = np.expand_dims(np.array(self.processor.sig_fore_out[:175], dtype=np.float32), axis=0)
+                #inputData = tf.data.Dataset.from_tensor_slices(inputData)
+                model = get_model(arch, dataInShape, UseDerivative)
+                model.load_weights(filePath)
+                BP_est = model.predict(inputData)
+                self.status.setText("处理完毕")
+                self.SBPlabel.setText("收缩压: " + str(BP_est[0]))
+                self.DBPlabel.setText("舒张压: " + str(BP_est[1]))
+                self.HRlabel.setText("心跳: " + str(self.heartRate))
+                del model
+                tf.keras.backend.clear_session()
+                gc.collect()
+                self.next.setEnabled(True)
             else:
                 self.status.setText("抱歉，图像中部分图片有问题，请重做。")
-                self.redo.setEnabled(True)
+                self.processor.cam = cv.VideoCapture(0)
+                self.processor.cam.set(cv.CAP_PROP_FPS, 25)
+                self.processor.cam.set(3, 1280)
+                self.processor.cam.set(4, 720)
+                self.processor.cam.set(6, cv.VideoWriter.fourcc('M', 'J', 'P', 'G'))
+                self.processor.Queue_saveframe.queue.clear()
+                self.processor.Queue_rawframe.queue.clear()
+                self.processor.Queue_Sig_fore.queue.clear()
+                self.processor.Flag_face = False
+                self.processor.Flag_Queue = False
+                self.processor.frame_display = None
+                self.processor.face_mask = None
+                self.processor.Sig_fore = None
+                self.processor.Sig_fore_out = None
+                self.start.setEnabled(True)
+                self.redo.setEnabled(False)
+                self.status.setText("空闲中。。。")
+                self.SBPlabel.setText("收缩压:")
+                self.DBPlabel.setText("舒张压:")
+                self.HRlabel.setText("心跳:")
+                self.Hist_fore_signal.setData(np.array([]), pen=(255, 0, 0))
+                self.processor.PROCESS_start()
 
     def DisplayImage(self):
         if self.processor.Queue_rawframe.empty():
@@ -272,12 +242,14 @@ class mainwin(QMainWindow, Ui_MainWindow):
                 self.processor.Queue_saveframe.put_nowait(image)
 
     # Creates the specified Butterworth filter and applies it.
-    def butterworth_filter(self, data, low, high, sample_rate, order=11):
-        nyquist_rate = sample_rate * 0.5
-        low /= nyquist_rate
-        high /= nyquist_rate
-        b, a = signal.butter(order, [low, high], btype='band')
-        return signal.lfilter(b, a, data)
+
+def get_model(architecture, input_shape, UseDerivative=False):
+    return {
+        'resnet': ResNet50_1D(input_shape, UseDerivative=UseDerivative),
+        'alexnet': AlexNet_1D(input_shape, UseDerivative=UseDerivative),
+        'slapnicar' : raw_signals_deep_ResNet(input_shape, UseDerivative=UseDerivative),
+        'lstm' : define_LSTM(input_shape)
+    }[architecture]
 
 def to_frequency_domain(signal):
     # 计算FFT
@@ -292,8 +264,8 @@ def findHR(signal):
     sorted_indices = np.argsort(amplitudes)[::-1]
     freqs = freqs[sorted_indices]
     freqs = freqs[:6]
-    for i in range(6):
-        print(f"Rank {i+1}: Frequency {freqs[i]:.2f} Hz, Amplitude {amplitudes[sorted_indices[i]]:.2f}")
+    #for i in range(6):
+        #print(f"Rank {i+1}: Frequency {freqs[i]:.2f} Hz, Amplitude {amplitudes[sorted_indices[i]]:.2f}")
     HR = 0
     for freq in freqs:
         if freq>=1 and freq<2:

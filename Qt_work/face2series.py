@@ -10,7 +10,7 @@ import copy
 import seaborn as sns
 
 sns.set()
-BufferSize = 1050
+BufferSize = 250
 
 class VIDEO2FACE:
     def __init__(self) -> None:

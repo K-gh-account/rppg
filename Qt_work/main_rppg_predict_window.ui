@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1384</width>
+    <width>1360</width>
     <height>844</height>
    </rect>
   </property>
@@ -40,7 +40,7 @@
     <property name="geometry">
      <rect>
       <x>1070</x>
-      <y>450</y>
+      <y>510</y>
       <width>301</width>
       <height>31</height>
      </rect>
@@ -93,21 +93,14 @@
       <x>1070</x>
       <y>180</y>
       <width>281</width>
-      <height>91</height>
+      <height>61</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLabel" name="label_SBP">
+      <widget class="QLabel" name="SBPlabel">
        <property name="text">
         <string>收缩压：</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="SBP">
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>
@@ -117,21 +110,18 @@
     <property name="geometry">
      <rect>
       <x>1070</x>
-      <y>300</y>
+      <y>270</y>
       <width>281</width>
-      <height>111</height>
+      <height>61</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QLabel" name="label_DBP">
+      <widget class="QLabel" name="DBPlabel">
        <property name="text">
         <string>舒张压：</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="DBP"/>
      </item>
     </layout>
    </widget>
@@ -171,6 +161,25 @@
      </rect>
     </property>
     <layout class="QHBoxLayout" name="signallayout"/>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>1070</x>
+      <y>360</y>
+      <width>281</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="HRlabel">
+       <property name="text">
+        <string>心跳：</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
